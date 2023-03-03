@@ -2,7 +2,10 @@ import { Link } from "react-router-dom";
 import { GoIssueOpened, GoIssueClosed, GoComment } from "react-icons/go";
 import { relativeDate } from "../helpers/relativeDate";
 import { useUserData } from "../helpers/useUserData";
+import fetchWithError from '../helpers/fetchWithError';
+
 import { Label } from "./Label";
+import { useQueryClient } from '@tanstack/react-query';
 
 export function IssueItem({
   title,
@@ -16,8 +19,13 @@ export function IssueItem({
 }) {
   const assigneeUser = useUserData(assignee);
   const createdByUser = useUserData(createdBy);
+  const queryClient = useQueryClient();
+
   return (
-    <li>
+    <li onMouseEnter={() => {
+      queryClient.prefetchQuery(['issues', number.toString()], () => fetchWithError(`/api/issues/${number}`))
+      queryClient.prefetchQuery(['issues', number.toString(), 'comments'], () => fetchWithError(`/api/issues/${number}/comments`))
+    }}>
       <div>
         {status === "done" || status === "cancelled" ? (
           <GoIssueClosed style={{ color: "red" }} />
