@@ -22,10 +22,17 @@ export function IssueItem({
   const queryClient = useQueryClient();
 
   return (
-    <li onMouseEnter={() => {
-      queryClient.prefetchQuery(['issues', number.toString()], () => fetchWithError(`/api/issues/${number}`))
-      queryClient.prefetchQuery(['issues', number.toString(), 'comments'], () => fetchWithError(`/api/issues/${number}/comments`))
-    }}>
+    <li
+      onMouseEnter={() => {
+        queryClient.prefetchQuery(["issues", number.toString()], () =>
+          fetchWithError(`/api/issues/${number}`)
+        );
+        queryClient.prefetchQuery(
+          ["issues", number.toString(), "comments"],
+          () => fetchWithError(`/api/issues/${number}/comments`)
+        );
+      }}
+    >
       <div>
         {status === "done" || status === "cancelled" ? (
           <GoIssueClosed style={{ color: "red" }} />
@@ -51,9 +58,8 @@ export function IssueItem({
             assigneeUser.isSuccess ? assigneeUser.data.profilePictureUrl : ""
           }
           className="assigned-to"
-          alt={`Assigned to ${
-            assigneeUser.isSuccess ? assigneeUser.data.name : "avatar"
-          }`}
+          alt={`Assigned to ${assigneeUser.isSuccess ? assigneeUser.data.name : "avatar"
+            }`}
         />
       ) : null}
       <span className="comment-count">

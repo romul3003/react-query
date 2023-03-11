@@ -3,17 +3,22 @@ import { useParams } from "react-router-dom";
 import { relativeDate } from "../helpers/relativeDate";
 import { useUserData } from "../helpers/useUserData";
 import { IssueHeader } from "./IssueHeader";
+import IssueStatus from "./IssueStatus";
+import IssueAssignment from './IssueAssignment';
+import IssueLabels from './IssueLabels';
 
 function useIssueData(issueNumber) {
   return useQuery(["issues", issueNumber], ({ signal }) => {
-  return fetch(`/api/issues/${issueNumber}`, { signal }).then((res) => res.json());
+    return fetch(`/api/issues/${issueNumber}`, { signal }).then((res) =>
+      res.json()
+    );
   });
 }
 
 function useIssueComments(issueNumber) {
   return useQuery(["issues", issueNumber, "comments"], ({ signal }) => {
-    return fetch(`/api/issues/${issueNumber}/comments`, { signal }).then((res) =>
-      res.json()
+    return fetch(`/api/issues/${issueNumber}/comments`, { signal }).then(
+      (res) => res.json()
     );
   });
 }
@@ -49,6 +54,8 @@ export default function IssueDetails() {
   const issueQuery = useIssueData(number);
   const commentsQuery = useIssueComments(number);
 
+  console.log('commentsQuery :>> ', commentsQuery);
+
   return (
     <div className="issue-details">
       {issueQuery.isLoading ? (
@@ -62,12 +69,27 @@ export default function IssueDetails() {
               {commentsQuery.isLoading ? (
                 <p>Loading...</p>
               ) : (
-                commentsQuery.data?.map((comment) => (
-                  <Comment key={comment.id} {...comment} />
-                ))
+                commentsQuery.data && commentsQuery.data?.map((comment) => {
+                  return (
+                    <Comment key={comment.id} {...comment} />
+                  )
+                })
               )}
             </section>
-            <aside></aside>
+            <aside>
+              <IssueStatus
+                status={issueQuery.data.status}
+                issueNumber={issueQuery.data.number.toString()}
+              />
+              <IssueAssignment
+                assignee={issueQuery.data.assignee}
+                issueNumber={issueQuery.data.number.toString()}
+              />
+              <IssueLabels
+                labels={issueQuery.data.labels}
+                issueNumber={issueQuery.data.number.toString()}
+              />
+            </aside>
           </main>
         </>
       )}
