@@ -1,5 +1,6 @@
 import { useQueryClient, useMutation } from '@tanstack/react-query';
-import { StatusSelect } from "./StatusSelect";
+
+import { StatusSelect } from './StatusSelect';
 
 export default function IssueStatus({ status, issueNumber }) {
   const queryClient = useQueryClient();
@@ -7,26 +8,23 @@ export default function IssueStatus({ status, issueNumber }) {
   const setStatus = useMutation(
     (status) => {
       return fetch(`/api/issues/${issueNumber}`, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          "content-type": "application/json",
+          'content-type': 'application/json',
         },
         body: JSON.stringify({ status }),
       }).then((res) => res.json());
     },
     {
       onMutate: (status) => {
-        const oldStatus = queryClient.getQueryData([
-          "issues",
-          issueNumber,
-        ]).status;
-        queryClient.setQueryData(["issues", issueNumber], (data) => ({
+        const oldStatus = queryClient.getQueryData(['issues', issueNumber]).status;
+        queryClient.setQueryData(['issues', issueNumber], (data) => ({
           ...data,
           status,
         }));
 
         return function rollback() {
-          queryClient.setQueryData(["issues", issueNumber], (data) => ({
+          queryClient.setQueryData(['issues', issueNumber], (data) => ({
             ...data,
             status: oldStatus,
           }));
@@ -36,9 +34,9 @@ export default function IssueStatus({ status, issueNumber }) {
         rollback();
       },
       onSettled: () => {
-        queryClient.invalidateQueries(["issues", issueNumber], { exact: true });
+        queryClient.invalidateQueries(['issues', issueNumber], { exact: true });
       },
-    }
+    },
   );
   return (
     <div className="issue-options">

@@ -6,21 +6,22 @@ import Loader from './Loader';
 
 export default function IssuesList({ labels, status, pageNum, setPageNum }) {
   const queryClient = useQueryClient();
-
   const issuesQuery = useQuery(
     ['issues', { labels, status, pageNum }],
     async ({ signal }) => {
       const statusString = status ? `&status=${status}` : '';
       const labelsString = labels.map((label) => `labels[]=${label}`).join('&');
-      const paginationString = pageNum ? `$page=${pageNum}` : '';
+      const paginationString = pageNum ? `&page=${pageNum}` : '';
 
       const results = await fetchWithError(
         `/api/issues?${labelsString}${statusString}${paginationString}`,
-        { signal },
+        {
+          signal,
+        },
       );
 
       results.forEach((issue) => {
-        queryClient.setQueriesData(['issues', String(issue.number)], issue);
+        queryClient.setQueryData(['issues', issue.number.toString()], issue);
       });
 
       return results;
@@ -29,7 +30,6 @@ export default function IssuesList({ labels, status, pageNum, setPageNum }) {
       keepPreviousData: true,
     },
   );
-
   const [searchValue, setSearchValue] = useState('');
 
   const searchQuery = useQuery(
@@ -99,12 +99,12 @@ export default function IssuesList({ labels, status, pageNum, setPageNum }) {
               Page {pageNum} {issuesQuery.isFetching ? '...' : ''}
             </p>
             <button
+              disabled={issuesQuery.data?.length === 0 || issuesQuery.isPreviousData}
               onClick={() => {
                 if (issuesQuery.data?.length !== 0 && !issuesQuery.isPreviousData) {
                   setPageNum(pageNum + 1);
                 }
               }}
-              disabled={issuesQuery.data?.length === 0 || issuesQuery.isPreviousData}
             >
               Next
             </button>

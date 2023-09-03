@@ -6,18 +6,18 @@ export default function AddIssue() {
   const navigate = useNavigate();
   const addIssue = useMutation(
     (issueBody) =>
-      fetch("/api/issues", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
+      fetch('/api/issues', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
         body: JSON.stringify(issueBody),
       }).then((res) => res.json()),
     {
       onSuccess: (data) => {
-        queryClient.invalidateQueries(["issues"], { exact: true });
-        queryClient.setQueryData(["issues", data.number.toString()], data);
+        queryClient.invalidateQueries(['issues'], { exact: true });
+        queryClient.setQueryData(['issues', data.number.toString()], data);
         navigate(`/issue/${data.number}`);
       },
-    }
+    },
   );
   return (
     <div className="add-issue">
@@ -37,7 +37,7 @@ export default function AddIssue() {
         <label htmlFor="comment">Comment</label>
         <textarea placeholder="Comment" id="comment" name="comment" />
         <button type="submit" disabled={addIssue.isLoading}>
-          {addIssue.isLoading ? "Adding Issue..." : "Add Issue"}
+          {addIssue.isLoading ? 'Adding Issue...' : 'Add Issue'}
         </button>
       </form>
     </div>
